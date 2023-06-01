@@ -1,0 +1,207 @@
+/// Copyright 2022 Norman Palardy 
+/// npalardy@great-white-software.com
+/// You may use this in any way you want but must provide attribution if this is included in other works
+
+// to test uncomment this & run in the IDESCript editor
+// Dim code As String
+// code = "// foo"
+// code = code + EndOfLine + "a = b/c"
+// code = code + EndOfLine + "if a<>b then"
+// 
+// 
+// Print( edit(code) )
+
+Function Name() As String
+	Return "Put spaces around operators"
+End Function
+
+Function CanEdit(Selection As String) As Boolean
+	If Selection = "" Then
+		Return False
+	Else
+
+		'Put your code to determine if your Code Assistant can edit or not here
+		'Returning true means your Code Assistant CAN edit the current selection
+		Return True
+
+	End If
+End Function
+
+Function Edit(Selection As String) As String
+	'Put the code that edits the selection from the Code Editor here
+
+	Dim l1 As String = MyReplaceLineEndings(Selection, EndOfLine)
+	Dim l2 As String = MyReplaceLineEndings(Selection, EndOfLine)
+
+	If l1 <> l2 Then
+		Break
+	End If
+
+	Dim lines() As String = Split( MyReplaceLineEndings(Selection, EndOfLine), EndOfLine)
+
+	For l As Integer = 0 To lines.ubound
+
+		Dim chars() As String = Split(lines(l), "")
+		Dim newChars() As String
+
+		Dim in_quoted_string As Boolean
+
+		For i As Integer = 0 To chars.ubound
+
+			Dim c As String = chars(i)
+
+			If in_quoted_string Then
+
+				If c = """" Then
+
+					newChars.append c
+
+					If i >= chars.ubound() Then
+						// we're going to be bailing out anyway so nothing to do
+					ElseIf chars(i+1) = """" Then
+						// doubled quotes were still in a string
+						newchars.append chars(i+1)
+					Else
+						in_quoted_string = Not in_quoted_string
+					End If
+
+				Else
+
+					newChars.append c
+
+				End If
+
+			ElseIf c = """" Then
+
+				in_quoted_string = True
+
+				newchars.append c
+
+			ElseIf c = ">" or c = "<" Then
+                if i < chars.ubound and IsOperator(c+chars(i+1)) then
+					// space before the > ?
+					If i > 0 And chars(i-1) <> " " Then
+						newChars.append " " 
+					End If
+
+					newchars.append c+chars(i+1)
+
+				// space AFTER the = ?
+		
+				If i+2 < chars.ubound And chars(i+2) <> " " Then
+					newChars.append " " 
+				End If
+
+				i = i + 1
+									
+                else
+
+					newChars.append c
+
+                end if
+
+			ElseIf c = "/" Then
+
+                if i < chars.ubound and chars(i+1) = "/" then
+
+					newchars.append c+chars(i+1)
+
+					// space AFTER the = ?
+		
+					If i+2 < chars.ubound And chars(i+2) <> " " Then
+						newChars.append " " 
+					End If
+
+					i = i + 1
+
+				ElseIf IsOperator(c) = true Then
+
+					// space before the / ?
+					If i > 0 And chars(i-1) <> " " Then
+						newChars.append " " 
+					End If
+		
+					newchars.append c
+		
+					// space AFTER the / ?
+		
+					If i < chars.ubound And chars(i+1) <> " " Then
+						newChars.append " " 
+					End If
+									
+                else
+
+					newChars.append c
+
+                end if
+
+			
+			ElseIf IsOperator(c) = true Then
+
+				// space before the = ?
+				If i > 0 And chars(i-1) <> " " Then
+					newChars.append " " 
+				End If
+		
+				newchars.append c
+		
+				// space AFTER the = ?
+		
+				If i < chars.ubound And chars(i+1) <> " " Then
+					newChars.append " " 
+				End If
+
+			Else
+
+				newChars.append c
+
+			End If
+
+		Next
+
+		lines(l) = Join(newchars,"")
+
+	Next
+
+	Return Join(lines,EndOfLine)
+
+
+End Function
+
+Function MyReplaceLineEndings(in_string As String, replace_str As String) As String
+
+	Dim r1 As String = ReplaceAll(in_string, &u0D + &u0A, EndOfLine )
+	Dim r2 As String = ReplaceAll(r1, &u0D, EndOfLine )
+	Dim r3 As String = ReplaceAll(r2, &u0A, EndOfLine )
+
+	Return ReplaceAll(r3, EndOfLine, replace_str)
+
+End Function
+
+Function IsOperator(char as String) as Boolean
+
+	select case char
+		case "="
+			return true
+		case "+"
+			return true
+		case "*"
+			return true
+		case "/"
+			return true
+		case "\"
+			return true
+		case "-"
+			return true
+		case "^"
+			return true			
+		case "<>"
+			return true
+		case ">="
+			return true
+		case "<="
+			return true	
+	end select
+	
+	return False
+End Function

@@ -104,15 +104,11 @@ Function Edit(Selection As String) As String
 
                 if i < chars.ubound and chars(i+1) = "/" then
 
-					newchars.append c+chars(i+1)
+					for j as integer = i to chars.ubound 
+					   newchars.append chars(j)
+					next
 
-					// space AFTER the = ?
-		
-					If i+2 < chars.ubound And chars(i+2) <> " " Then
-						newChars.append " " 
-					End If
-
-					i = i + 1
+					i = chars.ubound 
 
 				ElseIf IsOperator(c) = true Then
 
@@ -151,6 +147,12 @@ Function Edit(Selection As String) As String
 					newChars.append " " 
 				End If
 
+            ElseIf c = "'" Then
+	            for j as integer = i to chars.ubound 
+				   newchars.append chars(j)
+				next
+
+				i = chars.ubound  
 			Else
 
 				newChars.append c

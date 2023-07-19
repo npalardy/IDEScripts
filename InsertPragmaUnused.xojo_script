@@ -60,11 +60,13 @@ Sub DoInsertProgramUnusedForParams()
 
 	Next l
 
-	// 	Print(Join(to_insert, EndOfLine) + EndOfLine + EndOfLine)
-	SelStart = 0
-	SelLength = 0
-	Seltext = Join(to_insert, EndOfLine) + EndOfLine + EndOfLine
-
+	if to_insert.ubound >= 0 Then
+		// 	Print(Join(to_insert, EndOfLine) + EndOfLine + EndOfLine)
+		SelStart = 0
+		SelLength = 0
+		Seltext = Join(to_insert, EndOfLine) + EndOfLine + EndOfLine
+	end if
+	
 End Sub
 
 Module LanguageUtils
